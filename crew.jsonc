@@ -1,0 +1,224 @@
+{
+  // Display name for this crew
+  "name": "agriculturists",
+
+  // Agents to include — each must have a matching agents/<name>.jsonc file
+  "agents": ["judge_agent", "helper", "risk_averse_agent", "optimistic_agent"],
+
+  // Task definitions — executed in order for sequential process
+  "tasks": [
+    {
+      // Task identifier
+      "name": "analyze_the_agricultural_decision_task",
+
+      // What the task should accomplish
+      // Use {placeholder} inputs here; crewai run prompts for missing values
+      "description": "Analyze the agricultural decision from a risk-averse perspective.    Use the available MCP tools to retrieve the factual data required    for your analysis. Identify downside risks, adverse scenarios,    historical variability, poor outcomes, and meaningful uncertainties.    Do not make up information or provide a final decision. Produce    an evidence-based risk analysis that can be evaluated by the Judge.",
+
+      // Clear definition of what the output should look like
+      "expected_output": "A structured risk analysis containing:    - key findings    - downside factors    - relevant historical evidence    - important uncertainties    - potential adverse scenarios    - concise overall risk assessment",
+
+      // Optional task guardrail(s) validate output before completion
+      // Use "guardrail" for one rule or "guardrails" for many
+      // Failed guardrails retry up to guardrail_max_retries times
+      // "guardrail": "Every factual claim needs context support.",
+      // "guardrails": [
+      //   "Every factual claim must be supported by context.",
+      //   "The answer must match the expected output format."
+      // ],
+      // "guardrail_max_retries": 2,
+
+      // Advanced task options:
+      // Docs: https://docs.crewai.com/concepts/tasks
+      // "type": "ConditionalTask",
+      // "condition": { "python": "my_project.conditions.should_run" },
+      // "output_json": { "python": "my_project.models.ReportOutput" },
+      // "output_pydantic": null,
+      // "response_model": null,
+      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
+      // "markdown": false,
+      // "input_files": { "brief": "data/brief.txt" },
+      // "security_config": {},
+
+      // Which agent handles this task
+      "agent": "risk_averse_agent"
+
+      // "tools": [],
+      // "human_input": false,
+      // "async_execution": false
+    }
+,
+    {
+      // Task identifier
+      "name": "analyze_the_agricultural_decision_task_2",
+
+      // What the task should accomplish
+      // Use {placeholder} inputs here; crewai run prompts for missing values
+      "description": "Analyze the agricultural decision from an optimistic perspective.    Use the available MCP tools to retrieve the factual data required    for your analysis. Focus on recurring patterns, representative    historical outcomes, likely outcomes, favorable conditions, and    potential upside.    Do not allow rare negative outliers to disproportionately influence    the assessment unless there is evidence that they represent a    meaningful recurring risk. Do not make up information or provide    a final decision.",
+
+      // Clear definition of what the output should look like
+      "expected_output": "A structured optimistic analysis containing:    - key findings    - favorable factors    - relevant historical evidence    - likely outcome    - potential upside    - important uncertainties",
+
+      // Optional task guardrail(s) validate output before completion
+      // Use "guardrail" for one rule or "guardrails" for many
+      // Failed guardrails retry up to guardrail_max_retries times
+      // "guardrail": "Every factual claim needs context support.",
+      // "guardrails": [
+      //   "Every factual claim must be supported by context.",
+      //   "The answer must match the expected output format."
+      // ],
+      // "guardrail_max_retries": 2,
+
+      // Advanced task options:
+      // Docs: https://docs.crewai.com/concepts/tasks
+      // "type": "ConditionalTask",
+      // "condition": { "python": "my_project.conditions.should_run" },
+      // "output_json": { "python": "my_project.models.ReportOutput" },
+      // "output_pydantic": null,
+      // "response_model": null,
+      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
+      // "markdown": false,
+      // "input_files": { "brief": "data/brief.txt" },
+      // "security_config": {},
+
+      // Which agent handles this task
+      "agent": "optimistic_agent"
+
+      // "tools": [],
+      // "human_input": false,
+      // "async_execution": false
+    }
+,
+    {
+      // Task identifier
+      "name": "evaluate_the_riskaverse_and_task",
+
+      // What the task should accomplish
+      // Use {placeholder} inputs here; crewai run prompts for missing values
+      "description": "Evaluate the Risk-Averse and Optimistic analyses.    Compare their evidence and reasoning rather than simply choosing    between their conclusions. Identify disagreements, determine which    claims are supported by the available data, distinguish typical    outcomes from exceptional or tail-risk scenarios, and identify    important missing information.    If additional factual information is required, use the Helper    agent to retrieve it from the MCP server before reaching your    conclusion.    Produce the final assessment based on the available evidence.",
+
+      // Clear definition of what the output should look like
+      "expected_output": "A structured final assessment containing:    - summary of the relevant evidence    - comparison of the two perspectives    - important risks and opportunities    - additional information retrieved, if any    - key uncertainties    - final evidence-based conclusion",
+
+      // Optional task guardrail(s) validate output before completion
+      // Use "guardrail" for one rule or "guardrails" for many
+      // Failed guardrails retry up to guardrail_max_retries times
+      // "guardrail": "Every factual claim needs context support.",
+      // "guardrails": [
+      //   "Every factual claim must be supported by context.",
+      //   "The answer must match the expected output format."
+      // ],
+      // "guardrail_max_retries": 2,
+
+      // Advanced task options:
+      // Docs: https://docs.crewai.com/concepts/tasks
+      // "type": "ConditionalTask",
+      // "condition": { "python": "my_project.conditions.should_run" },
+      // "output_json": { "python": "my_project.models.ReportOutput" },
+      // "output_pydantic": null,
+      // "response_model": null,
+      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
+      // "markdown": false,
+      // "input_files": { "brief": "data/brief.txt" },
+      // "security_config": {},
+
+      // Which agent handles this task
+      "agent": "judge_agent",
+
+      // Task outputs used as context
+      "context": ["analyze_the_agricultural_decision_task", "analyze_the_agricultural_decision_task_2"]
+
+      // "tools": [],
+      // "human_input": false,
+      // "async_execution": false
+    }
+,
+    {
+      // Task identifier
+      "name": "retrieve_the_specific_factual_task",
+
+      // What the task should accomplish
+      // Use {placeholder} inputs here; crewai run prompts for missing values
+      "description": "Retrieve the specific factual information requested by the Judge    using the available MCP tools.    Return the requested information accurately and in a structured    format. Do not interpret the data, make recommendations, or    provide an independent assessment.",
+
+      // Clear definition of what the output should look like
+      "expected_output": "The requested factual data in a clear structured format, including",
+
+      // Optional task guardrail(s) validate output before completion
+      // Use "guardrail" for one rule or "guardrails" for many
+      // Failed guardrails retry up to guardrail_max_retries times
+      // "guardrail": "Every factual claim needs context support.",
+      // "guardrails": [
+      //   "Every factual claim must be supported by context.",
+      //   "The answer must match the expected output format."
+      // ],
+      // "guardrail_max_retries": 2,
+
+      // Advanced task options:
+      // Docs: https://docs.crewai.com/concepts/tasks
+      // "type": "ConditionalTask",
+      // "condition": { "python": "my_project.conditions.should_run" },
+      // "output_json": { "python": "my_project.models.ReportOutput" },
+      // "output_pydantic": null,
+      // "response_model": null,
+      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
+      // "markdown": false,
+      // "input_files": { "brief": "data/brief.txt" },
+      // "security_config": {},
+
+      // Which agent handles this task
+      "agent": "judge_agent"
+
+      // "tools": [],
+      // "human_input": false,
+      // "async_execution": false
+    }
+
+  ],
+
+  // Execution process
+  // "sequential" — tasks run in order, each receiving prior task outputs
+  // "hierarchical" — a manager agent delegates tasks (requires manager_llm)
+  "process": "sequential",
+
+  // Enable verbose logging during execution
+  "verbose": true,
+
+  // Enable crew memory — persists context and learnings across tasks
+  "memory": true,
+
+  // Automatically plan the execution strategy before running tasks
+  // "planning": false,
+
+  // LLM for the planning step (used when planning is true)
+  // "planning_llm": "openai/gpt-4o",
+
+  // LLM for the manager agent (required when process is "hierarchical")
+  // "manager_llm": "openai/gpt-4o",
+
+  // Crew-level LLM fields also accept object form for custom endpoints
+  // "chat_llm": {"model": "llama3", "provider": "ollama", "base_url": "http://localhost:11434"},
+
+  // Advanced crew options:
+  // Docs: https://docs.crewai.com/concepts/crews
+  // For hierarchical crews, manager_agent can reference an agents/<name>.jsonc file
+  // that is not included in the "agents" list.
+  // "manager_agent": "judge_agent",
+  // "before_kickoff_callbacks": [{"python": "my_project.callbacks.before_kickoff"}],
+  // "after_kickoff_callbacks": [{"python": "my_project.callbacks.after_kickoff"}],
+  // "function_calling_llm": "openai/gpt-4o-mini",
+  // "max_rpm": null,
+  // "cache": true,
+  // "knowledge_sources": [],
+  // "embedder": {},
+  // "output_log_file": "crew.log",
+  // "stream": false,
+  // "tracing": false,
+  // "security_config": {},
+
+  // Optional runtime input defaults.
+  // Use {placeholder} in agent or task text, for example:
+  // "description": "Research {topic} and write a brief"
+  // `crewai run` prompts for any placeholders missing from this object.
+  "inputs": {}
+}
