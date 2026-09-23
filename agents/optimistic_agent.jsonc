@@ -31,7 +31,10 @@
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
-  // "guardrail": "Only answer with information supported by retrieved evidence.",
+  "guardrail": {
+    "python": "agriculturists.gaurdrails.validate_optimistic_agent_output"
+  },
+  "guardrail_max_retries": 2,
   // "step_callback": {"python": "my_project.callbacks.on_agent_step"},
   // "guardrail_max_retries": 2,
 

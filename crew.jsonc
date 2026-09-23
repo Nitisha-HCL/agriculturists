@@ -3,13 +3,13 @@
   "name": "agriculturists",
 
   // Agents to include — each must have a matching agents/<name>.jsonc file
-  "agents": ["judge_agent", "helper", "risk_averse_agent", "optimistic_agent"],
+  "agents": ["judge_agent", "risk_averse_agent", "optimistic_agent"],
 
   // Task definitions — executed in order for sequential process
   "tasks": [
     {
       // Task identifier
-      "name": "analyze_the_agricultural_decision_task",
+      "name": "risk_analysis_task",
 
       // What the task should accomplish
       // Use {placeholder} inputs here; crewai run prompts for missing values
@@ -32,8 +32,11 @@
       // Docs: https://docs.crewai.com/concepts/tasks
       // "type": "ConditionalTask",
       // "condition": { "python": "my_project.conditions.should_run" },
-      // "output_json": { "python": "my_project.models.ReportOutput" },
-      // "output_pydantic": null,
+      "output_json": { "verdict": "...",
+                           "risk_factors": "...",
+                           "risk_level": "...",
+                           "common_findings": "...",
+                           "additional_info": "..."}   ,   // "output_pydantic": null,
       // "response_model": null,
       // "converter_cls": { "python": "my_project.converters.CustomConverter" },
       // "markdown": false,
@@ -41,7 +44,8 @@
       // "security_config": {},
 
       // Which agent handles this task
-      "agent": "risk_averse_agent"
+      "agent": "risk_averse_agent",
+      "context": ["optimistic_analysis_task"]
 
       // "tools": [],
       // "human_input": false,
@@ -50,7 +54,7 @@
 ,
     {
       // Task identifier
-      "name": "analyze_the_agricultural_decision_task_2",
+      "name": "optimistic_analysis_task",
 
       // What the task should accomplish
       // Use {placeholder} inputs here; crewai run prompts for missing values
@@ -73,7 +77,13 @@
       // Docs: https://docs.crewai.com/concepts/tasks
       // "type": "ConditionalTask",
       // "condition": { "python": "my_project.conditions.should_run" },
-      // "output_json": { "python": "my_project.models.ReportOutput" },
+      "output_json": { "historical_yield": "...", 
+                "typical_outcome": "...", 
+                "favorable_factors": "...", 
+                "potential_upside": "...", 
+                "evidence": "...", 
+                "uncertainty": "...",
+                "summary": "..." },
       // "output_pydantic": null,
       // "response_model": null,
       // "converter_cls": { "python": "my_project.converters.CustomConverter" },
@@ -91,7 +101,7 @@
 ,
     {
       // Task identifier
-      "name": "evaluate_the_riskaverse_and_task",
+      "name": "judge_task",
 
       // What the task should accomplish
       // Use {placeholder} inputs here; crewai run prompts for missing values
@@ -114,7 +124,11 @@
       // Docs: https://docs.crewai.com/concepts/tasks
       // "type": "ConditionalTask",
       // "condition": { "python": "my_project.conditions.should_run" },
-      // "output_json": { "python": "my_project.models.ReportOutput" },
+      "output_json": { "summary_of_evidence": "...", 
+                "comparison_of_perspectives": "...", 
+                "additional_information_retrieved": "...", 
+                "key_uncertainties": "...",
+                "final_conclusion": "..." },
       // "output_pydantic": null,
       // "response_model": null,
       // "converter_cls": { "python": "my_project.converters.CustomConverter" },
@@ -126,54 +140,12 @@
       "agent": "judge_agent",
 
       // Task outputs used as context
-      "context": ["analyze_the_agricultural_decision_task", "analyze_the_agricultural_decision_task_2"]
+      "context": ["risk_analysis_task", "optimistic_analysis_task"]
 
       // "tools": [],
       // "human_input": false,
       // "async_execution": false
     }
-,
-    {
-      // Task identifier
-      "name": "retrieve_the_specific_factual_task",
-
-      // What the task should accomplish
-      // Use {placeholder} inputs here; crewai run prompts for missing values
-      "description": "Retrieve the specific factual information requested by the Judge    using the available MCP tools.    Return the requested information accurately and in a structured    format. Do not interpret the data, make recommendations, or    provide an independent assessment.",
-
-      // Clear definition of what the output should look like
-      "expected_output": "The requested factual data in a clear structured format, including",
-
-      // Optional task guardrail(s) validate output before completion
-      // Use "guardrail" for one rule or "guardrails" for many
-      // Failed guardrails retry up to guardrail_max_retries times
-      // "guardrail": "Every factual claim needs context support.",
-      // "guardrails": [
-      //   "Every factual claim must be supported by context.",
-      //   "The answer must match the expected output format."
-      // ],
-      // "guardrail_max_retries": 2,
-
-      // Advanced task options:
-      // Docs: https://docs.crewai.com/concepts/tasks
-      // "type": "ConditionalTask",
-      // "condition": { "python": "my_project.conditions.should_run" },
-      // "output_json": { "python": "my_project.models.ReportOutput" },
-      // "output_pydantic": null,
-      // "response_model": null,
-      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
-      // "markdown": false,
-      // "input_files": { "brief": "data/brief.txt" },
-      // "security_config": {},
-
-      // Which agent handles this task
-      "agent": "judge_agent"
-
-      // "tools": [],
-      // "human_input": false,
-      // "async_execution": false
-    }
-
   ],
 
   // Execution process

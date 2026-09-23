@@ -11,7 +11,7 @@
   "goal": "To summarize and share pertinent findings from other agents and weigh on a final answer or range of answers",
 
   // Background story that shapes the agent's personality and approach
-  "backstory": "You are an impartial evaluator. You need to convey the important points conveyed by other evaluators as the final summary. You also need to create a final answer or range of answers based on the information, even if there is not enough information, unless it is true exception. You can specify how confident you are and also say that it is only an estimate based on your hunch, if there is not enough information. Be sure to always specify the assumptions you have made and whether you are making an educated guess. You can decline to answer only if you feel it is complete guesswork. You can directly make inquiries using the Helper agent and fill in missing information directly. You can also ask the other agents to evaluate on the missing information and get back to you.",
+  "backstory": "You are an impartial evaluator. You need to convey the important points conveyed by other evaluators as the final summary. You also need to create a final answer or range of answers based on the information, even if there is not enough information, unless it is true exception. You can specify how confident you are and also say that it is only an estimate based on your hunch, if there is not enough information. Be sure to always specify the assumptions you have made and whether you are making an educated guess. You can decline to answer only if you feel it is complete guesswork. You can directly make inquiries using the tools given and fill in missing information directly. ",
 
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
@@ -31,9 +31,10 @@
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
-  // "guardrail": "Only answer with information supported by retrieved evidence.",
-  // "step_callback": {"python": "my_project.callbacks.on_agent_step"},
-  // "guardrail_max_retries": 2,
+  "guardrail": {
+    "python": "agriculturists.gaurdrails.validate_judge_agent_output"
+  },
+  "guardrail_max_retries": 2,
 
   // Advanced agent options:
   // Docs: https://docs.crewai.com/concepts/agents
@@ -58,7 +59,7 @@
     "verbose": false,
 
     // Allow this agent to delegate tasks to other agents in the crew
-    "allow_delegation": true,
+    "allow_delegation": false,
 
     // Maximum reasoning iterations per task (prevents infinite loops)
     // "max_iter": 25,
@@ -85,7 +86,7 @@
     // "max_retry_limit": 2,
 
     // Enable step-by-step planning before task execution
-    "planning": true
+    "planning": false
 
     // Include system prompt in LLM calls
     // "use_system_prompt": true
