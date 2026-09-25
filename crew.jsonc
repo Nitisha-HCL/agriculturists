@@ -7,52 +7,7 @@
 
   // Task definitions — executed in order for sequential process
   "tasks": [
-    {
-      // Task identifier
-      "name": "risk_analysis_task",
-
-      // What the task should accomplish
-      // Use {placeholder} inputs here; crewai run prompts for missing values
-      "description": "Analyze the agricultural decision from a risk-averse perspective.    Use the available MCP tools to retrieve the factual data required    for your analysis. Identify downside risks, adverse scenarios,    historical variability, poor outcomes, and meaningful uncertainties.    Do not make up information or provide a final decision. Produce    an evidence-based risk analysis that can be evaluated by the Judge.",
-
-      // Clear definition of what the output should look like
-      "expected_output": "A structured risk analysis containing:    - key findings    - downside factors    - relevant historical evidence    - important uncertainties    - potential adverse scenarios    - concise overall risk assessment",
-
-      // Optional task guardrail(s) validate output before completion
-      // Use "guardrail" for one rule or "guardrails" for many
-      // Failed guardrails retry up to guardrail_max_retries times
-      // "guardrail": "Every factual claim needs context support.",
-      // "guardrails": [
-      //   "Every factual claim must be supported by context.",
-      //   "The answer must match the expected output format."
-      // ],
-      // "guardrail_max_retries": 2,
-
-      // Advanced task options:
-      // Docs: https://docs.crewai.com/concepts/tasks
-      // "type": "ConditionalTask",
-      // "condition": { "python": "my_project.conditions.should_run" },
-      "output_json": { "verdict": "...",
-                           "risk_factors": "...",
-                           "risk_level": "...",
-                           "common_findings": "...",
-                           "additional_info": "..."}   ,   // "output_pydantic": null,
-      // "response_model": null,
-      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
-      // "markdown": false,
-      // "input_files": { "brief": "data/brief.txt" },
-      // "security_config": {},
-
-      // Which agent handles this task
-      "agent": "risk_averse_agent",
-      "context": ["optimistic_analysis_task"]
-
-      // "tools": [],
-      // "human_input": false,
-      // "async_execution": false
-    }
-,
-    {
+        {
       // Task identifier
       "name": "optimistic_analysis_task",
 
@@ -93,6 +48,51 @@
 
       // Which agent handles this task
       "agent": "optimistic_agent"
+
+      // "tools": [],
+      // "human_input": false,
+      // "async_execution": false
+    },
+
+    {
+      // Task identifier
+      "name": "risk_analysis_task",
+
+      // What the task should accomplish
+      // Use {placeholder} inputs here; crewai run prompts for missing values
+      "description": "Analyze the agricultural decision from a risk-averse perspective.    Use the available MCP tools to retrieve the factual data required    for your analysis. Identify downside risks, adverse scenarios,    historical variability, poor outcomes, and meaningful uncertainties.    Do not make up information or provide a final decision. Produce    an evidence-based risk analysis that can be evaluated by the Judge.",
+
+      // Clear definition of what the output should look like
+      "expected_output": "A structured risk analysis containing:    - key findings    - downside factors    - relevant historical evidence    - important uncertainties    - potential adverse scenarios    - concise overall risk assessment",
+
+      // Optional task guardrail(s) validate output before completion
+      // Use "guardrail" for one rule or "guardrails" for many
+      // Failed guardrails retry up to guardrail_max_retries times
+      // "guardrail": "Every factual claim needs context support.",
+      // "guardrails": [
+      //   "Every factual claim must be supported by context.",
+      //   "The answer must match the expected output format."
+      // ],
+      // "guardrail_max_retries": 2,
+
+      // Advanced task options:
+      // Docs: https://docs.crewai.com/concepts/tasks
+      // "type": "ConditionalTask",
+      // "condition": { "python": "my_project.conditions.should_run" },
+      "output_json": { "verdict": "...",
+                           "risk_factors": "...",
+                           "risk_level": "...",
+                           "common_findings": "...",
+                           "additional_info": "..."}   ,   // "output_pydantic": null,
+      // "response_model": null,
+      // "converter_cls": { "python": "my_project.converters.CustomConverter" },
+      // "markdown": false,
+      // "input_files": { "brief": "data/brief.txt" },
+      // "security_config": {},
+
+      // Which agent handles this task
+      "agent": "risk_averse_agent",
+      "context": ["optimistic_analysis_task"]
 
       // "tools": [],
       // "human_input": false,

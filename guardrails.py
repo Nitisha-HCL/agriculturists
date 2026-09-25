@@ -1,7 +1,7 @@
 from crewai.tasks.task_output import TaskOutput
 
 
-def validate_optimistic_analysis(result: TaskOutput):
+def validate_optimistic_agent_output(result: TaskOutput):
     """Validate the optimistic agent's output."""
 
     output = result.json_dict
@@ -38,7 +38,7 @@ def validate_optimistic_analysis(result: TaskOutput):
 
     return True
 
-def validate_risk_analysis(result: TaskOutput):
+def validate_risk_averse_agent_output(result: TaskOutput):
     """Validate the risk-averse agent's output."""
 
     output = result.json_dict
@@ -76,7 +76,7 @@ def validate_risk_analysis(result: TaskOutput):
 
     return True
 
-def validate_judge(result: TaskOutput):
+def validate_judge_agent_output(result: TaskOutput):
     """Validate the final judge output."""
 
     output = result.json_dict

@@ -11,12 +11,12 @@
   "goal": "Evaluate agricultural options by identifying potential risks, downside scenarios, uncertainties, and adverse conditions. Analyze the available data conservatively and prioritize evidence that could indicate financial or operational losses. Provide a clear assessment of the major risks and explain what conditions could make the decision unfavorable.",
 
   // Background story that shapes the agent's personality and approach
-  "backstory": "You are a cautious agricultural analyst with extensive experience evaluating crop and farming decisions under uncertainty. You focus on protecting against downside risk rather than assuming favorable conditions. You carefully examine historical performance, market conditions, crop-specific risks, environmental factors, and uncertainty in the available data. You do not assume that missing information is favorable; instead, you explicitly identify gaps and avoid making claims that are not supported by the available evidence.",
+  "backstory": "You are a cautious agricultural analyst with extensive experience evaluating crop and farming decisions under uncertainty. You focus on protecting against downside risk rather than assuming favorable conditions. You carefully examine historical performance, market conditions, crop-specific risks, environmental factors, and uncertainty in the available data. You do not assume that missing information is favorable; instead, you explicitly identify gaps and avoid making claims that are not supported by the available evidence. Before calling `query_database`, use the available tool resources to determine the valid field names and required parameters. Do not guess field names. First inspect the available tool information, then construct the `query_database` call using only valid fields.",
 
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
   // For custom endpoints or deployment-based providers, replace with:
-  // "llm": {"model": "llama3", "provider": "ollama", "base_url": "http://localhost:11434"},
+  //"llm": {"model": "qwen2.5:3b", "provider": "ollama", "base_url": "http://localhost:11434"},
   // "llm": {"deployment_name": "my-deployment", "provider": "azure", "api_version": "2024-10-21"},
   "llm": "gemini/gemini-3.8-flash",
 
@@ -26,13 +26,15 @@
   // Tools available to this agent
   // Built-in: "SerperDevTool", "ScrapeWebsiteTool", "FileReadTool", etc.
   // Custom: "custom:my_tool" loads from tools/my_tool.py
-  "tools": [],
-
+  "tools": ["custom:read_farm_blogs"],
+  "mcps": [
+        "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
+      ],
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
   "guardrail": {
-      "python": "agriculturists.gaurdrails.validate_risk_averse_agent_output"
+      "python": "guardrails.validate_risk_averse_agent_output"
     },
   "guardrail_max_retries": 2,
 
@@ -59,7 +61,7 @@
     "verbose": false,
 
     // Allow this agent to delegate tasks to other agents in the crew
-    "allow_delegation": true,
+    "allow_delegation": false,
 
     // Maximum reasoning iterations per task (prevents infinite loops)
     // "max_iter": 25,
@@ -86,7 +88,7 @@
     // "max_retry_limit": 2,
 
     // Enable step-by-step planning before task execution
-    "planning": true
+    "planning": false
 
     // Include system prompt in LLM calls
     // "use_system_prompt": true

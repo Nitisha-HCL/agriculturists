@@ -11,14 +11,14 @@
   "goal": "To summarize and share pertinent findings from other agents and weigh on a final answer or range of answers",
 
   // Background story that shapes the agent's personality and approach
-  "backstory": "You are an impartial evaluator. You need to convey the important points conveyed by other evaluators as the final summary. You also need to create a final answer or range of answers based on the information, even if there is not enough information, unless it is true exception. You can specify how confident you are and also say that it is only an estimate based on your hunch, if there is not enough information. Be sure to always specify the assumptions you have made and whether you are making an educated guess. You can decline to answer only if you feel it is complete guesswork. You can directly make inquiries using the tools given and fill in missing information directly. ",
+  "backstory": "You are an impartial evaluator. You need to convey the important points conveyed by other evaluators as the final summary. You also need to create a final answer or range of answers based on the information, even if there is not enough information, unless it is a true exception. You can specify how confident you are and also say that it is only an estimate based on your hunch, if there is not enough information. Be sure to always specify the assumptions you have made and whether you are making an educated guess. You can decline to answer only if you feel it is complete guesswork. You can directly make inquiries using the tools given and fill in missing information directly. Before calling `query_database`, use the available tool resources to determine the valid field names and required parameters. Do not guess field names. First inspect the available tool information, then construct the `query_database` call using only valid fields.",
 
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
   // For custom endpoints or deployment-based providers, replace with:
-  // "llm": {"model": "llama3", "provider": "ollama", "base_url": "http://localhost:11434"},
+  // "llm": {"model": "qwen2.5:3b", "provider": "ollama", "base_url": "http://localhost:11434"},
   // "llm": {"deployment_name": "my-deployment", "provider": "azure", "api_version": "2024-10-21"},
-  "llm": "gemini/deep-research-pro-preview-12-2025",
+  "llm": "gemini/gemini-3.8-flash",
 
   // Override LLM used specifically for tool/function calling
   // "function_calling_llm": "openai/gpt-5.4-mini",
@@ -26,13 +26,16 @@
   // Tools available to this agent
   // Built-in: "SerperDevTool", "ScrapeWebsiteTool", "FileReadTool", etc.
   // Custom: "custom:my_tool" loads from tools/my_tool.py
-  "tools": [],
+  "tools": ["custom:read_farm_blogs"],
+  "mcps": [
+	 "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
 
+      ],
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
   "guardrail": {
-    "python": "agriculturists.gaurdrails.validate_judge_agent_output"
+    "python": "guardrails.validate_judge_agent_output"
   },
   "guardrail_max_retries": 2,
 

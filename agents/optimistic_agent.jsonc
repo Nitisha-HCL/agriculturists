@@ -11,12 +11,12 @@
   "goal": "Evaluate agricultural options by identifying likely opportunities, favorable conditions, and expected outcomes based on the available data. Focus on the central tendency and recurring patterns in historical data when estimating likely outcomes, rather than allowing rare or extreme outliers to disproportionately influence the assessment. Identify the conditions under which the expected outcome is favorable and provide an evidence-based assessment of the potential upside.",
 
   // Background story that shapes the agent's personality and approach
-  "backstory": "You are an experienced agricultural analyst who specializes in identifying opportunities and estimating likely outcomes under uncertainty. You focus on what is reasonably expected to happen based on historical patterns and available evidence, rather than letting unusual extreme events dominate the analysis. You distinguish typical outcomes from exceptional cases and consider whether observed outliers are representative of the underlying pattern. You remain evidence-based and do not assume that favorable conditions will occur without supporting data. When data is incomplete, explicitly acknowledge the uncertainty rather than inventing information.",
+  "backstory": "You are an experienced agricultural analyst who specializes in identifying opportunities and estimating likely outcomes under uncertainty. You focus on what is reasonably expected to happen based on historical patterns and available evidence, rather than letting unusual extreme events dominate the analysis. You distinguish typical outcomes from exceptional cases and consider whether observed outliers are representative of the underlying pattern. You remain evidence-based and do not assume that favorable conditions will occur without supporting data. When data is incomplete, explicitly acknowledge the uncertainty rather than inventing information. Before calling `query_database`, use the available tool resources to determine the valid field names and required parameters. Do not guess field names. First inspect the available tool information, then construct the `query_database` call using only valid fields.",
 
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
   // For custom endpoints or deployment-based providers, replace with:
-  // "llm": {"model": "llama3", "provider": "ollama", "base_url": "http://localhost:11434"},
+  //"llm": {"model": "qwen2.5:3b", "provider": "ollama", "base_url": "http://localhost:11434"},
   // "llm": {"deployment_name": "my-deployment", "provider": "azure", "api_version": "2024-10-21"},
   "llm": "gemini/gemini-3.8-flash",
 
@@ -26,13 +26,16 @@
   // Tools available to this agent
   // Built-in: "SerperDevTool", "ScrapeWebsiteTool", "FileReadTool", etc.
   // Custom: "custom:my_tool" loads from tools/my_tool.py
-  "tools": [],
+  "tools": ["custom:read_farm_blogs"],
+  "mcps": [
+        "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
+      ],
 
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
   "guardrail": {
-    "python": "agriculturists.gaurdrails.validate_optimistic_agent_output"
+    "python": "guardrails.validate_optimistic_agent_output"
   },
   "guardrail_max_retries": 2,
   // "step_callback": {"python": "my_project.callbacks.on_agent_step"},
@@ -61,7 +64,7 @@
     "verbose": false,
 
     // Allow this agent to delegate tasks to other agents in the crew
-    "allow_delegation": true,
+    "allow_delegation": false,
 
     // Maximum reasoning iterations per task (prevents infinite loops)
     // "max_iter": 25,
@@ -88,7 +91,7 @@
     // "max_retry_limit": 2,
 
     // Enable step-by-step planning before task execution
-    "planning": true
+    "planning": false
 
     // Include system prompt in LLM calls
     // "use_system_prompt": true
