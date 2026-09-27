@@ -16,9 +16,9 @@
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
   // For custom endpoints or deployment-based providers, replace with:
-  //"llm": {"model": "qwen2.5:3b", "provider": "ollama", "base_url": "http://localhost:11434"},
+  "llm": {"model": "qwen2.5:3b", "provider": "ollama", "base_url": "http://localhost:11434"},
   // "llm": {"deployment_name": "my-deployment", "provider": "azure", "api_version": "2024-10-21"},
-  "llm": "gemini/gemini-3.8-flash",
+  //"llm": "gemini/gemini-3.8-flash",
 
   // Override LLM used specifically for tool/function calling
   // "function_calling_llm": "openai/gpt-5.4-mini",
