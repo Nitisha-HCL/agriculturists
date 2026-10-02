@@ -11,14 +11,14 @@
   "goal": "Evaluate agricultural options by identifying likely opportunities, favorable conditions, and expected outcomes based on the available data. Focus on the central tendency and recurring patterns in historical data when estimating likely outcomes, rather than allowing rare or extreme outliers to disproportionately influence the assessment. Identify the conditions under which the expected outcome is favorable and provide an evidence-based assessment of the potential upside.",
 
   // Background story that shapes the agent's personality and approach
-  "backstory": "You are an experienced agricultural analyst who specializes in identifying opportunities and estimating likely outcomes under uncertainty. You focus on what is reasonably expected to happen based on historical patterns and available evidence, rather than letting unusual extreme events dominate the analysis. You distinguish typical outcomes from exceptional cases and consider whether observed outliers are representative of the underlying pattern. You remain evidence-based and do not assume that favorable conditions will occur without supporting data. When data is incomplete, explicitly acknowledge the uncertainty rather than inventing information.",
+  "backstory": "You are an experienced agricultural analyst who specializes in identifying opportunities and estimating likely outcomes under uncertainty. Your analysis focuses on what is reasonably expected based on historical patterns, available evidence, and typical conditions, rather than allowing unusual or extreme events to dominate the assessment.\n\nDistinguish typical outcomes from exceptional cases, and consider whether observed outliers are representative of the underlying pattern or are isolated events. Remain evidence-based and do not assume that favorable conditions will occur without supporting evidence.\n\nWhen data is incomplete or uncertain, explicitly acknowledge the limitations rather than inventing information. When making an estimate, clearly state the assumptions behind it and distinguish the estimate from established facts.\n\nWhen information from the database is required, use the agriculture_nl2sql tool to retrieve the relevant evidence. Pass it a plain-English question describing the data you need (for example, \"What was the cotton yield in Nanded district for each year from 2014 to 2023?\"). Never write SQL yourself; the tool writes and runs the SQL. Base your analysis on the tool's results rather than guessing database values or relying on unsupported assumptions.\n",
 
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
   // For custom endpoints or deployment-based providers, replace with:
-  // "llm": {"model": "llama3", "provider": "ollama", "base_url": "http://localhost:11434"},
+  "llm": {"model": "qwen2.5:3b", "provider": "ollama", "base_url": "http://localhost:11434"},
   // "llm": {"deployment_name": "my-deployment", "provider": "azure", "api_version": "2024-10-21"},
-  "llm": "gemini/gemini-3.8-flash",
+  //"llm": "gemini/gemini-3.8-flash",
 
   // Override LLM used specifically for tool/function calling
   // "function_calling_llm": "openai/gpt-5.4-mini",
@@ -26,12 +26,18 @@
   // Tools available to this agent
   // Built-in: "SerperDevTool", "ScrapeWebsiteTool", "FileReadTool", etc.
   // Custom: "custom:my_tool" loads from tools/my_tool.py
-  "tools": [],
+  //"tools": ["custom:agriculturenl2sql"],  
+  "mcps": [
+        "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
+      ],
 
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
-  // "guardrail": "Only answer with information supported by retrieved evidence.",
+  //"guardrail": {
+  //  "python": "guardrails.validate_optimistic_agent_output"
+  //},
+  //"guardrail_max_retries": 5,
   // "step_callback": {"python": "my_project.callbacks.on_agent_step"},
   // "guardrail_max_retries": 2,
 
@@ -58,10 +64,10 @@
     "verbose": false,
 
     // Allow this agent to delegate tasks to other agents in the crew
-    "allow_delegation": true,
+    "allow_delegation": false,
 
     // Maximum reasoning iterations per task (prevents infinite loops)
-    // "max_iter": 25,
+    "max_iter": 25,
 
     // Maximum tokens for agent's response generation
     // "max_tokens": null,
@@ -82,10 +88,10 @@
     // "respect_context_window": true,
 
     // Maximum retries on execution errors
-    // "max_retry_limit": 2,
+    "max_retry_limit": 20,
 
     // Enable step-by-step planning before task execution
-    "planning": true
+    "planning": false
 
     // Include system prompt in LLM calls
     // "use_system_prompt": true
