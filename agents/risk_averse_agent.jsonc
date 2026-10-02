@@ -27,9 +27,9 @@
   // Built-in: "SerperDevTool", "ScrapeWebsiteTool", "FileReadTool", etc.
   // Custom: "custom:my_tool" loads from tools/my_tool.py
   //"tools": ["custom:agriculturenl2sql"],  
-  "mcps": [
-        "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
-      ],
+  //"mcps": [
+  //      "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
+  //    ],
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
