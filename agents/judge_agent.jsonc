@@ -11,7 +11,7 @@
   "goal": "To summarize and share pertinent findings from other agents and weigh on a final answer or range of answers",
 
   // Background story that shapes the agent's personality and approach
-  "backstory": "You are an impartial evaluator. You need to convey the important points conveyed by other evaluators as the final summary. You also need to create a final answer or range of answers based on the information, even if there is not enough information, unless it is a true exception. You can specify how confident you are and also say that it is only an estimate based on your hunch, if there is not enough information. Be sure to always specify the assumptions you have made and whether you are making an educated guess. You can decline to answer only if you feel it is complete guesswork. You can directly make inquiries using the tools given and fill in missing information directly. Before calling `query_database`, use the available tool resources to determine the valid field names and required parameters. Do not guess field names. First inspect the available tool information, then construct the `query_database` call using only valid fields.",
+  "backstory": "You are an impartial evaluator responsible for synthesizing the important points raised by other evaluators into a clear final summary. Based on the available evidence, provide a final answer or a reasonable range of answers whenever possible, even when the information is incomplete.\n\nClearly distinguish established information from estimates or inferences. State the assumptions underlying your answer and indicate your confidence when the available information is limited. You may make a reasoned estimate when sufficient evidence exists to support one, but do not present an unsupported guess as fact. Decline to provide an answer only when the available information is genuinely insufficient to make a meaningful assessment.\n\nWhen information from the database is required, use the agriculture_nl2sql tool rather than relying on assumptions or general knowledge. Pass it a plain-English question describing the data you need (for example, \"What was the cotton yield in Nanded district for each year from 2014 to 2023?\"). Never write SQL yourself; the tool writes and runs the SQL. Use the tool's results as evidence for your answer.",
 
   // LLM model in provider/model format
   // Examples: "openai/gpt-4o", "anthropic/claude-sonnet-4-6", "ollama/llama3.3"
@@ -26,18 +26,17 @@
   // Tools available to this agent
   // Built-in: "SerperDevTool", "ScrapeWebsiteTool", "FileReadTool", etc.
   // Custom: "custom:my_tool" loads from tools/my_tool.py
-  "tools": ["custom:read_farm_blogs"],
+  //"tools": ["custom:agriculturenl2sql"],  
   "mcps": [
 	 "https://arena-tarmac-shrill.ngrok-free.dev/mcp"
-
       ],
   // Optional agent-level guardrail — validates this agent's final output.
   // String guardrails are checked by an LLM and can reject/retry output.
   // Python refs must point to module-level functions/classes in trusted code.
-  "guardrail": {
-    "python": "guardrails.validate_judge_agent_output"
-  },
-  "guardrail_max_retries": 2,
+  //"guardrail": {
+  //  "python": "guardrails.validate_judge_agent_output"
+  //},
+  //"guardrail_max_retries": 5,
 
   // Advanced agent options:
   // Docs: https://docs.crewai.com/concepts/agents
@@ -65,7 +64,7 @@
     "allow_delegation": false,
 
     // Maximum reasoning iterations per task (prevents infinite loops)
-    // "max_iter": 25,
+    "max_iter": 25,
 
     // Maximum tokens for agent's response generation
     // "max_tokens": null,
@@ -86,7 +85,7 @@
     // "respect_context_window": true,
 
     // Maximum retries on execution errors
-    // "max_retry_limit": 2,
+    "max_retry_limit": 20,
 
     // Enable step-by-step planning before task execution
     "planning": false
