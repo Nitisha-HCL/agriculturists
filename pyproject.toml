@@ -5,17 +5,28 @@ description = "agriculturists using crewAI"
 authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "crewai[tools]>=1.15.22,<2.0.0"
+    "crewai[google-genai,tools]>=1.15.22,<2.0.0",
+    "langchain-openai>=1.6.7",
+    "langchain-postgres>=0.0.18",
 ]
+
+[project.scripts]
+# `crewai run` (type = "flow") and `uv run kickoff "<question>"` start the router flow.
+kickoff = "router_flow:kickoff"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-only-include = ["agents", "crew.jsonc", "tools", "knowledge", "skills"]
+only-include = ["agents", "router_flow.py", "schemas.py", "tools", "knowledge", "skills"]
 
 [tool.crewai]
-type = "crew"
-definition = "crew.jsonc"
+# The router flow (router_flow.py) replaced the manager-led crew (crew.jsonc).
+type = "flow"
 project_id = "7cbabd5a-7c04-4029-89f2-e11c85c6a396"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
