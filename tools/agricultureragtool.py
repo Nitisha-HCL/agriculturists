@@ -10,6 +10,7 @@ structured agriculture tables used by the NL2SQL tool.
 
 import asyncio
 import os
+import re
 import sys
 from typing import Any
 
@@ -57,6 +58,64 @@ EMBEDDING_MODEL = os.environ.get(
 )
 
 DEFAULT_K = 3
+# Candidates fetched before crop filtering; chickpea.pdf alone holds ~75% of the
+# chunks, so a plain top-3 search is easily swamped by off-crop passages.
+FETCH_K = 15
+
+# Crop names recognised in questions, mapped to the spelling used for matching.
+CROP_SYNONYMS = {
+    "cotton": "cotton",
+    "chickpea": "chickpea",
+    "gram": "chickpea",
+    "chana": "chickpea",
+    "rice": "rice",
+    "paddy": "rice",
+    "maize": "maize",
+    "corn": "maize",
+    "wheat": "wheat",
+}
+
+# Sources whose file name does not reveal their crop.
+SOURCE_CROPS = {
+    "iepf101.pdf": "rice",
+}
+
+
+def detect_crop(text: str) -> str | None:
+    """The single crop a question is about, or None if it names zero or several."""
+    found = {
+        crop
+        for word, crop in CROP_SYNONYMS.items()
+        if re.search(rf"\b{word}s?\b", text or "", re.IGNORECASE)
+    }
+    return found.pop() if len(found) == 1 else None
+
+
+def source_crop(source: str) -> str | None:
+    """The crop a document is about, or None for crop-neutral documents."""
+    if source in SOURCE_CROPS:
+        return SOURCE_CROPS[source]
+    return detect_crop(re.sub(r"[_\-.]+", " ", source))
+
+
+def filter_by_crop(docs: list, crop: str | None, k: int = DEFAULT_K) -> tuple[list, bool]:
+    """Keep documents about `crop` (or crop-neutral ones), de-duplicated, top k.
+
+    Returns (docs, filtered). When nothing matches, returns the unfiltered top k
+    and filtered=False so the caller can say so.
+    """
+    unique, seen = [], set()
+    for doc in docs:
+        key = (doc.metadata.get("source"), doc.metadata.get("page"), doc.page_content[:200])
+        if key not in seen:
+            seen.add(key)
+            unique.append(doc)
+    if not crop:
+        return unique[:k], False
+    matching = [d for d in unique if source_crop(d.metadata.get("source", "")) in (crop, None)]
+    if matching:
+        return matching[:k], True
+    return unique[:k], False
 
 
 # ============================================================
@@ -70,6 +129,14 @@ class AgricultureRAGInput(BaseModel):
             "A natural-language question describing the information you "
             "want to find in the agricultural document knowledge base. "
             "Do not write SQL."
+        ),
+    )
+    crop: str | None = Field(
+        default=None,
+        description=(
+            "The crop the question is about (e.g. 'cotton'), so only documents "
+            "about that crop are searched. Optional: detected from the question "
+            "when omitted."
         ),
     )
 
@@ -87,7 +154,8 @@ class AgricultureRAGTool(BaseTool):
         "and hybrid retrieval. Use this tool when information may be found "
         "in agricultural reports, crop-management documents, irrigation "
         "guidelines, farming practices, or other unstructured documents. "
-        "Pass a natural-language question, never SQL."
+        "Pass a natural-language question, never SQL, and the crop it is about; "
+        "only documents about that crop are returned."
     )
 
     args_schema: type[BaseModel] = AgricultureRAGInput
@@ -128,16 +196,18 @@ class AgricultureRAGTool(BaseTool):
     # CrewAI tool entry point
     # --------------------------------------------------------
 
-    def _run(self, question: str) -> str:
+    def _run(self, question: str, crop: str | None = None) -> str:
+
+        crop = CROP_SYNONYMS.get((crop or "").strip().lower()) or detect_crop(question)
 
         try:
 
             # Sync API on purpose: it runs on PGEngine's own background loop,
             # so it also works when the caller already has a running event loop
             # (e.g. Jupyter), where asyncio.run() raises RuntimeError.
-            results = self._get_vector_store().similarity_search(
+            candidates = self._get_vector_store().similarity_search(
                 query=question,
-                k=DEFAULT_K,
+                k=FETCH_K,
             )
 
         except Exception as exc:
@@ -145,6 +215,8 @@ class AgricultureRAGTool(BaseTool):
             return (
                 f"RAG retrieval failed: {type(exc).__name__}: {exc}"
             )
+
+        results, filtered = filter_by_crop(candidates, crop)
 
         if not results:
 
@@ -154,6 +226,12 @@ class AgricultureRAGTool(BaseTool):
             )
 
         output = []
+
+        if crop and not filtered:
+            output.append(
+                f"NOTE: No documents about {crop} matched this question; the "
+                "results below are about other crops and may not apply."
+            )
 
         for i, doc in enumerate(results, start=1):
 

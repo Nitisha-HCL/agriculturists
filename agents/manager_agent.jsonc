@@ -1,3 +1,6 @@
+// RETIRED (specs/001-router-flow): replaced by router_flow.py, the CrewAI
+// Router-pattern Flow. No longer referenced by pyproject.toml or main.ipynb;
+// kept for reference only.
 {
   // Agent's role title — appears in prompts and logs.
   // This agent is the crew's manager_agent (see crew.jsonc), so it must NOT be

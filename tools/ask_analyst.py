@@ -1,10 +1,10 @@
-"""Lets the Judge request more information from an analyst mid-task.
+"""Lets the Judge request more information from an analyst or the Farming
+Specialist mid-task.
 
-In a hierarchical crew, an agent the manager delegates to runs with only its own
-tools: it cannot call back to the manager or reach its coworkers. This tool
-gives the Judge that channel. It loads the requested analyst from its
-agents/<name>.jsonc definition (same role, backstory, LLM and database tool as
-in the crew) and runs the request with Agent.kickoff().
+The Judge's agent run has no other way to reach its coworkers. This tool loads
+the requested agent from its agents/<name>.jsonc definition (same role,
+backstory, LLM and tools) and runs the request with Agent.kickoff(). Every
+request and reply is kept in `log` so the router flow can record follow-ups.
 
 Only one BaseTool subclass may live in this module: the custom tool loader
 instantiates the first one it finds.
@@ -22,8 +22,11 @@ AGENTS_DIR = Path(__file__).resolve().parent.parent / "agents"
 ANALYSTS = {
     "optimisticagent": "optimistic_agent.jsonc",
     "riskaverseagent": "risk_averse_agent.jsonc",
+    "farmingspecialist": "farming_specialist.jsonc",
 }
-# Caps follow-up requests per crew run so a small model cannot loop forever.
+AGENT_NAMES = "'Optimistic_Agent', 'Risk_Averse_Agent' or 'Farming_Specialist'"
+# Caps follow-up requests per tool instance (one per question in the router
+# flow) so a small model cannot loop forever.
 MAX_REQUESTS = 3
 
 
@@ -34,7 +37,11 @@ def _normalize(name: str) -> str:
 class AskAnalystInput(BaseModel):
     analyst: str = Field(
         ...,
-        description="Who to ask: 'Optimistic_Agent' (typical outcomes, upside) or 'Risk_Averse_Agent' (downside, variability).",
+        description=(
+            "Who to ask: 'Optimistic_Agent' (historical data: typical outcomes, upside), "
+            "'Risk_Averse_Agent' (historical data: downside, variability) or "
+            "'Farming_Specialist' (crop best practices)."
+        ),
     )
     question: str = Field(
         ...,
@@ -52,20 +59,27 @@ class AskAnalystInput(BaseModel):
 class AskAnalystTool(BaseTool):
     name: str = "ask_analyst"
     description: str = (
-        "Request more information from an analyst when an important disagreement or "
-        "gap cannot be settled from the analyses you have. The analyst queries the "
-        "agriculture database and reports back. Ask one specific question per call; "
+        "Request more information from an analyst or the Farming Specialist when an "
+        "important disagreement or gap cannot be settled from the answers you have. "
+        "They query the agriculture database or the crop best-practice documents and "
+        "report back. Ask one specific question per call; "
         f"at most {MAX_REQUESTS} requests are allowed per run."
     )
     args_schema: type[BaseModel] = AskAnalystInput
 
     _agents: dict[str, Any] = PrivateAttr(default_factory=dict)
     _requests: int = PrivateAttr(default=0)
+    _log: list[dict[str, str]] = PrivateAttr(default_factory=list)
+
+    @property
+    def log(self) -> list[dict[str, str]]:
+        """Each request made so far: {"agent", "question", "reply"}."""
+        return list(self._log)
 
     def _run(self, analyst: str, question: str, context: str = "") -> str:
         key = _normalize(analyst)
         if key not in ANALYSTS:
-            return "Unknown analyst. Use 'Optimistic_Agent' or 'Risk_Averse_Agent'."
+            return f"Unknown agent. Use {AGENT_NAMES}."
         if self._requests >= MAX_REQUESTS:
             return (
                 f"The limit of {MAX_REQUESTS} information requests has been reached. "
@@ -87,6 +101,8 @@ class AskAnalystTool(BaseTool):
             "neither source contains the information, say so plainly. Do not invent information."
         )
         try:
-            return self._agents[key].kickoff(prompt).raw
+            reply = self._agents[key].kickoff(prompt).raw
         except Exception as exc:
-            return f"The analyst could not complete the request: {exc}"
+            reply = f"The agent could not complete the request: {exc}"
+        self._log.append({"agent": analyst, "question": question, "reply": reply})
+        return reply
