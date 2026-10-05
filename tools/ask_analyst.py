@@ -80,10 +80,11 @@ class AskAnalystTool(BaseTool):
             "The Judge needs more information before reaching a conclusion.\n"
             f"Context: {context or 'None given.'}\n"
             f"Request: {question}\n\n"
-            "Use the agriculture_nl2sql tool to get the data, passing it a plain-English "
-            "question, never SQL. Report the data returned and what it shows about the "
-            "request. If the database does not contain the information, say so plainly. "
-            "Do not invent information."
+            "Use the agriculture_nl2sql tool for historical data, or the "
+            "agriculture_rag_search tool for crop best practices, passing a plain-English "
+            "question, never SQL. Report what was returned (with the source document for "
+            "anything from agriculture_rag_search) and what it shows about the request. If "
+            "neither source contains the information, say so plainly. Do not invent information."
         )
         try:
             return self._agents[key].kickoff(prompt).raw
