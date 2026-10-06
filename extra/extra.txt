@@ -1,0 +1,71 @@
+if args == ["--plan-only"]:
+        run_plan_only()
+        return
+
+# ---------------------------------------------------------------------------
+# Entry points
+# ---------------------------------------------------------------------------
+
+REFERENCE_QUESTIONS = [
+    ("How has cotton yield in Nanded changed over the last 10 years, and what pest management practices are recommended for cotton?", "mixed"),
+    ("What was rice yield in Durg in 2015, and how should rice be irrigated?", "mixed"),
+    ("Which Maharashtra districts had the highest chickpea yields after 2010, and how is chickpea wilt managed?", "mixed"),
+    ("How did rainfall affect maize yield in Durg, and what fertilizer schedule is recommended for kharif maize?", "mixed"),
+    ("What was rice yield in Durg in 2015?", "historical"),
+    ("How has cotton area in Nanded changed since 2000?", "historical"),
+    ("How should chickpea wilt be managed?", "best_practice"),
+    ("When should kharif maize be irrigated?", "best_practice"),
+    ("What is the capital of France?", "out_of_scope"),
+    ("Recommend a good laptop for programming.", "out_of_scope"),
+]
+
+
+def run_plan_only() -> int:
+    """Router-only check of the quickstart reference questions (SC-001, SC-002)."""
+    llm = router_llm()
+    correct = 0
+    for number, (question, expected) in enumerate(REFERENCE_QUESTIONS, start=1):
+        plan = plan_question(question, llm)
+        label = route_label(plan)
+        correct += label == expected
+        mark = "OK " if label == expected else "XX "
+        print(f"{mark}{number:2}. expected={expected:13} got={label:13} {question}")
+        for part in plan.parts:
+            print(f"        - {part.kind:13} {part.question}")
+    print(f"\n{correct}/{len(REFERENCE_QUESTIONS)} route labels correct (target ≥ 9)")
+    return correct
+
+def run_plan_only() -> int:
+    """Router-only check of the quickstart reference questions (SC-001, SC-002)."""
+    llm = router_llm()
+    correct = 0
+    for number, (question, expected) in enumerate(REFERENCE_QUESTIONS, start=1):
+        plan = plan_question(question, llm)
+        label = route_label(plan)
+        correct += label == expected
+        mark = "OK " if label == expected else "XX "
+        print(f"{mark}{number:2}. expected={expected:13} got={label:13} {question}")
+        for part in plan.parts:
+            print(f"        - {part.kind:13} {part.question}")
+    print(f"\n{correct}/{len(REFERENCE_QUESTIONS)} route labels correct (target ≥ 9)")
+    return correct
+
+
+# The Judge's full verdict on the historical part (None if the question had no historical part)
+print(flow.state.final.judge_verdict)
+
+# Run record: route, parts, who answered with which tools, Judge review, final author
+state = flow.state
+print("Route:", state.route)
+for number, part in enumerate(state.plan.parts, start=1):
+    print(f"{number}. [{part.kind} -> suggested {part.suggested_tool}] {part.question}")
+for answer in state.part_answers:
+    print(f"   part {answer.part_index + 1}: {answer.agent_role} used {answer.tools_used or 'no tool'}"
+          + (f" (error: {answer.error})" if answer.error else ""))
+
+final = state.final
+print("\nJudge reviewed historical answers:", final.judge_verdict is not None,
+      "| follow-ups:", final.follow_up_requests)
+for follow_up in final.follow_ups:
+    print(f"   asked {follow_up.agent}: {follow_up.question}")
+print("Final answer written by:", final.written_by)

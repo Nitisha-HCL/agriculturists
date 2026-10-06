@@ -1,0 +1,28 @@
+# Python 3.10–3.13 (crewai does not support 3.14 yet; see pyproject.toml requires-python).
+#
+#   py -3.13 -m venv .venv
+#   .venv\Scripts\activate
+#   pip install -r requirements.txt
+
+# CrewAI: agents, flows, tools; google-genai is the native Gemini provider
+# (Judge and Summarizer run on gemini/gemini-3.8-flash).
+crewai[tools,google-genai]>=1.15.22,<2.0.0
+
+# RAG tool (tools/agricultureragtool.py): OpenAI embeddings + PGVectorStore
+langchain-openai>=1.6.7
+langchain-postgres>=0.0.18
+
+# PostgreSQL drivers: asyncpg/psycopg 3 for the async PGEngine used by the RAG
+# tool; SQLAlchemy for the NL2SQL tool
+asyncpg>=0.31
+psycopg[binary]>=3.2
+sqlalchemy>=2.0
+
+python-dotenv>=1.0
+
+# Notebooks (main.ipynb, run_flow.ipynb)
+mlflow
+ipykernel
+
+# Tests
+pytest
